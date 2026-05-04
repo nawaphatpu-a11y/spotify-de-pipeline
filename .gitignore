@@ -1,0 +1,8 @@
+dataset.csv
+spotify_cleaned.csv
+Archived_null.csv
+pipeline.log
+spotify.db
+tempCodeRunnerFile.py
+*.log
+*.db
