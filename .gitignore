@@ -6,3 +6,4 @@ spotify.db
 tempCodeRunnerFile.py
 *.log
 *.db
+.env
