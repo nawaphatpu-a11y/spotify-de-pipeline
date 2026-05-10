@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 import logging
 
-load_dotenv(dotenv_path="C:/Users/User/Desktop/Project/.env")
+load_dotenv()
 
 logging.basicConfig(
     filename = "Load_to_postgres.log",
@@ -17,7 +17,7 @@ def connect():
 
     logging.info("Start Connected")
     conn = psycopg2.connect(
-    f"host={os.getenv('DB_HOST')} "
+    f"host={os.getenv('DB_HOST_DOCKER')} "
     f"port={os.getenv('DB_PORT')} "
     f"dbname={os.getenv('DB_NAME')} "
     f"user={os.getenv('DB_USER')} "
@@ -28,7 +28,7 @@ def connect():
     logging.info("Start Reading File")
     df = pd.read_csv("spotify_cleaned.csv", low_memory=False)
     engine = create_engine(
-        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST_DOCKER')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
     )
     logging.info(f"Loaded {len(df)} rows")
 
