@@ -4,6 +4,9 @@ Archived_null.csv
 pipeline.log
 spotify.db
 tempCodeRunnerFile.py
+Program.py
 *.log
 *.db
 .env
+__pycache__/
+.pytest_cache/
