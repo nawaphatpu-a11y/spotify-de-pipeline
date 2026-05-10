@@ -4,4 +4,4 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY etl_spotify.py .
 COPY load_to_postgres.py .
-CMD [ "python", "etl_spotify.py" ]
+CMD [ "sh", "-c", "python etl_spotify.py && python load_to_postgres.py" ]
