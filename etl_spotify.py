@@ -1,23 +1,42 @@
 import pandas as pd
 import logging 
 import os
+import boto3
+import io
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.basicConfig(
-    filename = "pipeline.log",
-    level = logging.INFO,
-    format = "%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("pipeline.log"),
+        logging.StreamHandler()
+    ]
 )
 
-def extract():
+def read_from_s3(key):
+    logging.info("Start read from s3")
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+        region_name=os.getenv('AWS_REGION')
+    )
+    obj = s3.get_object(Bucket=os.getenv('AWS_BUCKET_NAME'), Key=key)
+    logging.info("Data Ready!")
+    return pd.read_csv(io.BytesIO(obj['Body'].read()))
 
+def extract():
     logging.info("Extract started")
-    df = pd.read_csv("dataset.csv")
+
+    df = read_from_s3('dataset.csv')
     logging.info(f"Loaded {len(df)} rows")
     return df
 
 def validate():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    df = pd.read_csv(os.path.join(base_dir , "dataset.csv"))
+
+    df = read_from_s3('dataset.csv')
     expected_type = {
         "popularity": "int64",
         "danceability" : "float64",
@@ -43,7 +62,7 @@ def transform():
 
     logging.info("Transform started")
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    df = pd.read_csv(os.path.join(base_dir , "dataset.csv"))
+    df = read_from_s3('dataset.csv')
     #df_genre_info = pd.DataFrame({
     #    "track_genre": ["pop","jazz","hip-hop","acoustic", "black-metal"],
     #    "mood": ["Happy", "Relaxed", "Energetic", "Calm", "Dark"]
@@ -66,12 +85,13 @@ def transform():
     logging.info(f"Archived {len(null_rows)} null rows")
     logging.info(f"Clear data: {len(df_clean)} rows")
 
+    df_clean.to_csv(os.path.join(base_dir, "spotify_cleaned.csv"), index=False) 
     return df_clean 
 
 def load():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    df = pd.read_csv(os.path.join(base_dir , "dataset.csv"))
     logging.info("Load started")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(base_dir, "spotify_cleanded.csv"))
     df.to_csv(os.path.join(base_dir, "spotify_cleaned.csv"), index = False)
     logging.info("Load complete")
 
