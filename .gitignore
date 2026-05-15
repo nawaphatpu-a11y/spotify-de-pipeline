@@ -10,3 +10,4 @@ Program.py
 .env
 __pycache__/
 .pytest_cache/
+load_to_postgres.log
